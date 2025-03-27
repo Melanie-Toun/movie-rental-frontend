@@ -17,43 +17,31 @@ const MovieSlider = ({category}) => {
         const getContent = async () => {
             try {
                 let res;
-                if (contentType === 'movie') {
-                    // Movie-specific filtering
+                if (contentType === "movies") {
                     res = await axios.get('/api/admin/movies');
-                    let filteredMovies = res.data.movies.filter(movie => {
+                    console.log("Movies API Response:", res.data); // Debugging
+                    let filteredMovies = (res.data.movies || []).filter(movie => {  // Ensure movies is an array
                         switch(category) {
-                            case 'popular':
-                                return movie.isAction;
-                            case 'top_rated':
-                                return movie.isComedy;
-                            case 'upcoming':
-                                return movie.isHorror;
-                            case 'now_playing':
-                                return movie.isDrama;
-                            case 'rentals':
-                                return true;
-                            default:
-                                return false;
+                            case 'popular': return movie.isAction;
+                            case 'top_rated': return movie.isComedy;
+                            case 'upcoming': return movie.isHorror;
+                            case 'now_playing': return movie.isDrama;
+                            case 'rentals': return true;
+                            default: return false;
                         }
                     });
                     setContent(filteredMovies);
                 } else {
-                    // TV Show-specific filtering
                     res = await axios.get('/api/admin/tvshows');
-                    let filteredTvShows = res.data.tvShows.filter(show => {
+                    console.log("TV Shows API Response:", res.data); // Debugging
+                    let filteredTvShows = (res.data.tvShows || []).filter(show => { // Ensure tvShows is an array
                         switch(category) {
-                            case 'popular':
-                                return show.isAction;
-                            case 'on_the_air':
-                                return show.isComedy;
-                            case 'top_rated':
-                                return show.isHorror;
-                            case 'airing_today':
-                                return show.isDrama;
-                            case 'rentals':
-                                return true;
-                            default:
-                                return false;
+                            case 'popular': return show.isAction;
+                            case 'on_the_air': return show.isComedy;
+                            case 'top_rated': return show.isHorror;
+                            case 'airing_today': return show.isDrama;
+                            case 'rentals': return true;
+                            default: return false;
                         }
                     });
                     setContent(filteredTvShows);
@@ -61,7 +49,7 @@ const MovieSlider = ({category}) => {
             } catch (error) {
                 console.error("Error fetching content:", error);
                 setContent([]);
-            }
+            }            
         };
         getContent();
     }, [contentType, category]);
