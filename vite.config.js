@@ -14,23 +14,33 @@
 // })
 
 
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
-import path from 'path'
+import * as path from 'path'
+import { fileURLToPath } from 'url'
 
-export default defineConfig({
-  plugins: [react()],
-  resolve: {
-    alias: {
-      // eslint-disable-next-line no-undef
-      "@": path.resolve(__dirname, "src"), // Add this line for alias
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, __dirname, '') // Fixes process.cwd() error
+
+  return {
+    plugins: [react()],
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "src"), // Fixes alias issue
+      },
     },
-  },
-  server: {
-    proxy: {
-      '/api': {
-        target: 'process.env.VITE_BACKEND_URL || "https://movie-rental-backend-0bcb.onrender.com"',
-      }
-    }
+    server: {
+      proxy: {
+        "/api": {
+          target: env.VITE_BACKEND_URL || "https://movie-rental-backend-0bcb.onrender.com",
+          changeOrigin: true,
+          secure: false,
+        },
+      },
+    },
   }
 })
+
